@@ -1,41 +1,46 @@
 require("dotenv").config();
 
-const express = require("express");
 const mongoose = require("mongoose");
+const express = require("express");
 const app = express();
-const port = 8000;
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 //My routes
-const authRoute = require("./routes/auth");
-const userRoute = require("./routes/user")
-const categoryRoute = require("./routes/category")
-const productRoute = require("./routes/product")
-const orderRoute = require("./routes/order")
-mongoose.connect(
-  process.env.DATABASE,
-  {
+const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/user");
+const categoryRoutes = require("./routes/category");
+const productRoutes = require("./routes/product");
+const orderRoutes = require("./routes/order");
+
+//DB Connection
+mongoose
+  .connect(process.env.DATABASE, {
     useNewUrlParser: true,
-    useCreateIndex: true,
     useUnifiedTopology: true,
-  },
-  (err) => {
-    if (err) throw err;
+    useCreateIndex: true
+  })
+  .then(() => {
     console.log("DB CONNECTED");
-  }
-);
+  });
+
+//Middlewares
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(cors())
-//my routes
-app.use('/api',authRoute);
-app.use('/api',userRoute);
-app.use('/api',categoryRoute);
-app.use('/api',productRoute);
-app.use('/api',orderRoute);
-app.listen(port, (err) => {
-  if (err) throw err;
-  console.log(`Server listening at port ${port}`);
+app.use(cors());
+
+//My Routes
+app.use("/api", authRoutes);
+app.use("/api", userRoutes);
+app.use("/api", categoryRoutes);
+app.use("/api", productRoutes);
+app.use("/api", orderRoutes);
+
+//PORT
+const port = process.env.PORT || 8080;
+
+//Starting a server
+app.listen(port, () => {
+  console.log(`app is running at ${port}`);
 });
